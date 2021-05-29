@@ -1,0 +1,193 @@
+<!-- Este laboratorio fue con ayuda de Julio Herrera, Me explicó lo del movimiento del personaje entre arrays y manejo de estados
+Lo trabajamos juntos y me hizo entender bien como funcionan los estados en React. Lo demas si lo hice yo.-->
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Allerta&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const htmlRoot = document.getElementById('root')
+
+        const getMazeData = async (width, height) => {
+            const response = await fetch(`http://ubeje.xyz:3001/?type=json&w=${width}&h=${height}`)
+            const data = await response.json()
+            return data
+        }
+
+        const Principal = () => {
+
+            const Start = () => {
+                return (
+                    <div className='startc'>
+                        <div className='start'>
+                            <h1 className='title' >¡Laberinto!</h1>
+                            <br />
+                            <button onClick={() => setScreen(<Maze width={5} height={5} name={'Facilito'} />)}>Facilito</button>
+                            <button onClick={() => setScreen(<Maze width={8} height={8} name={'Regular'} />)}>Regular</button>
+                            <button onClick={() => setScreen(<Maze width={15} height={15} name={'Hardcore'} />)}>Hardcore</button><br />
+                        </div>
+                    </div>
+                )
+            }
+
+            const Maze = props => {
+                const win = (i, j, oi, oj) => {
+                    if (data[i][j] === 'g') {
+                        setDirection('flag')
+                        setData(oldData => {
+                            let newData = [...oldData]
+                            newData[oi][oj] = ' '
+                            newData[i][j] = 'p'
+                            return newData
+                        })
+
+                    }
+                }
+
+                const updatePos = (state, action) => {
+                    switch (action.type) {
+                        case 'ArrowRight':
+                            if (data[state.i][state.j + 1] === ' ') {
+                                setDirection('side')
+                                setData(oldData => {
+                                    let newData = [...oldData]
+                                    newData[state.i][state.j] = ' '
+                                    newData[state.i][state.j + 1] = 'p'
+                                    return newData
+                                })
+                                return { i: state.i, j: state.j + 1 }
+                            } else {
+                                win(state.i, state.j + 1, state.i, state.j)
+                                return { i: state.i, j: state.j }
+                            }
+                            break;
+                        case 'ArrowLeft':
+                            if (data[state.i][state.j - 1] === ' ') {
+                                setDirection('side2')
+                                setData(oldData => {
+                                    let newData = [...oldData]
+                                    newData[state.i][state.j] = ' '
+                                    newData[state.i][state.j - 1] = 'p'
+                                    return newData
+                                })
+                                return { i: state.i, j: state.j - 1 }
+                            } else {
+                                win(state.i, state.j - 1, state.i, state.j)
+                                return { i: state.i, j: state.j }
+                            }
+                            break;
+                        case 'ArrowUp':
+                            if (data[state.i - 1][state.j] === ' ') {
+                                setDirection('back')
+                                setData(oldData => {
+                                    let newData = [...oldData]
+                                    newData[state.i][state.j] = ' '
+                                    newData[state.i - 1][state.j] = 'p'
+                                    return newData
+                                })
+                                return { i: state.i - 1, j: state.j }
+                            } else {
+                                win(state.i - 1, state.j, state.i, state.j)
+                                return { i: state.i, j: state.j }
+                            }
+                            break;
+                        case 'ArrowDown':
+                            if (data[state.i + 1][state.j] === ' ') {
+                                setDirection('front')
+                                setData(oldData => {
+                                    let newData = [...oldData]
+                                    newData[state.i][state.j] = ' '
+                                    newData[state.i + 1][state.j] = 'p'
+                                    return newData
+                                })
+                                return { i: state.i + 1, j: state.j }
+                            } else {
+                                win(state.i + 1, state.j, state.i, state.j)
+                                return { i: state.i, j: state.j }
+                            }
+                            break;
+                        default:
+                            return { i: state.i, j: state.j }
+                            break
+                    }
+                }
+
+                const [data, setData] = React.useState([])
+                const [direction, setDirection] = React.useState('front')
+                const [pos, posDispatch] = React.useReducer(updatePos, { i: 1, j: 1 })
+
+                React.useEffect(() => {
+                    if (data.length === 0) getMazeData(props.width, props.height).then(res => setData(res))
+                }, [data])
+
+                const grid = {
+                    display: 'grid',
+                    'grid-template-columns': `repeat(${data[0]?.length}, 1fr)`,
+                    'grid-template-rows': `repeat(${data.length}, 1fr)`
+                }
+
+                return (
+                    <div>
+                        <p className='steps'></p>
+                        <div
+                            style={grid}
+                            className="gridContainer"
+                            tabIndex="1"
+                            ref={el => el && el.focus()}
+                            onKeyDown={(event) => posDispatch({ type: event.key })}>
+                            {data.map(row => {
+                                return (
+                                    row.map(element => {
+                                        switch (element) {
+                                            case 'p':
+                                                return (<div className={'player ' + direction}></div>)
+                                                break;
+                                            case 'g':
+                                                return (<div className='goal'></div>)
+                                                break;
+                                            case ' ':
+                                                return (<div className='space'></div>)
+                                                break;
+                                            default:
+                                                return (<div className='wall'></div>)
+                                        }
+                                    })
+                                )
+                            })}
+                        </div>
+                    </div>
+                )
+            }
+
+            const SCREENS = {
+                START: () => { return (<Start />) },
+            }
+
+            const [screen, setScreen] = React.useState(SCREENS.START)
+
+            return (
+                <div>
+                    {screen}
+                </div>
+            )
+        }
+
+        ReactDOM.render(
+            <Principal />,
+            htmlRoot
+        )
+    </script>
+</body>
+
+</html>

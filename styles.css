@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    background-image: url('./images/wall.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.wall {
+    width: 50px;
+    height: 50px;
+    background-image: url("./images/wall.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.goal {
+    width: 50px;
+    height: 50px;
+    background-image: url("./images/flag.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.space {
+    width: 50px;
+    height: 50px;
+    background-image: url("./images/floor.gif");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.startc {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 75px);
+}
+
+.start {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-flow: row wrap;
+}
+
+.start br {
+    width: 100%;
+    content: ' ';
+}
+
+.start button {
+    background-color: #8094AF;
+    border: 5px solid #8094AF;
+    cursor: pointer;
+    color: white;
+    margin: 20px;
+    padding: 5px 30px 5px 30px;
+    border-radius: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 1.5em;
+}
+
+.steps + div {
+    background-color: white;
+}
+
+
+.gridContainer {
+    width: 100vw;
+    height: 100vh;
+}
+
+.player {
+    width: 50px;
+    height: 50px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-color: white;
+}
+
+.title {
+    color: white;
+    font-family: 'Roboto', sans-serif;
+    font-size: 4em;
+}
+
+.back {
+    background-image: url("./images/back.gif");
+}
+
+.front {
+    background-image: url("./images/front.gif");
+}
+
+.side {
+    background-image: url("./images/side.gif");
+}
+
+.side2 {
+    background-image: url("./images/side2.gif");
+}
+
+.flag {
+    background-image: url("./images/playerwin.gif");
+}
+
+
